@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>01d_Monk — Digital Products Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #080a0d;
+      --surface: #0d1117;
+      --gold: #c9a84c;
+      --gold-dim: #7a621f;
+      --white: #e8e4dc;
+      --muted: #4a5568;
+      --mono: 'Space Mono', monospace;
+      --sans: 'Syne', sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: var(--sans);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* Custom cursor */
+    .cursor {
+      width: 8px; height: 8px;
+      background: var(--gold);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.1s;
+      mix-blend-mode: difference;
+    }
+    .cursor-ring {
+      width: 32px; height: 32px;
+      border: 1px solid var(--gold);
+      border-radius: 50%;
+      position: fixed;
+      pointer-events: none;
+      z-index: 9998;
+      transition: all 0.15s ease;
+      opacity: 0.5;
+    }
+
+    /* Noise overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.4;
+    }
+
+    /* Grid lines */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(201,168,76,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(201,168,76,0.03) 1px, transparent 1px);
+      background-size: 80px 80px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      padding: 24px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 100;
+      background: linear-gradient(to bottom, rgba(8,10,13,0.95), transparent);
+    }
+    .logo {
+      font-family: var(--mono);
+      font-size: 15px;
+      color: var(--gold);
+      letter-spacing: 0.05em;
+    }
+    .logo span { color: var(--white); }
+    nav ul {
+      list-style: none;
+      display: flex;
+      gap: 40px;
+    }
+    nav ul a {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    nav ul a:hover { color: var(--gold); }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 120px 48px 80px;
+      position: relative;
+    }
+    .hero-inner { max-width: 900px; }
+
+    .tag {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--gold);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .tag::before {
+      content: '';
+      width: 32px;
+      height: 1px;
+      background: var(--gold);
+    }
+
+    h1 {
+      font-family: var(--sans);
+      font-weight: 800;
+      font-size: clamp(52px, 8vw, 110px);
+      line-height: 0.95;
+      letter-spacing: -0.03em;
+      margin-bottom: 40px;
+    }
+    h1 .binary {
+      color: var(--gold);
+      font-family: var(--mono);
+      font-size: 0.85em;
+    }
+    h1 .underscore {
+      color: var(--gold-dim);
+      animation: blink 1.2s step-end infinite;
+    }
+    @keyframes blink { 50% { opacity: 0; } }
+
+    .hero-desc {
+      font-size: 18px;
+      line-height: 1.7;
+      color: #8a9ab5;
+      max-width: 520px;
+      margin-bottom: 56px;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 20px;
+      align-items: center;
+    }
+    .btn-primary {
+      background: var(--gold);
+      color: #080a0d;
+      padding: 14px 32px;
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: all 0.2s;
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+    }
+    .btn-primary:hover { background: #e8c46a; transform: translateY(-2px); }
+    .btn-secondary {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      text-decoration: none;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: color 0.2s;
+    }
+    .btn-secondary:hover { color: var(--white); }
+    .btn-secondary::after { content: '→'; }
+
+    /* Floating binary */
+    .binary-float {
+      position: absolute;
+      right: 48px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--gold-dim);
+      opacity: 0.3;
+      line-height: 2;
+      user-select: none;
+      animation: drift 8s ease-in-out infinite;
+    }
+    @keyframes drift {
+      0%, 100% { transform: translateY(-50%); }
+      50% { transform: translateY(calc(-50% - 20px)); }
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold-dim), transparent);
+      margin: 0 48px;
+      opacity: 0.4;
+    }
+
+    /* ── PRODUCTS ── */
+    .section {
+      padding: 100px 48px;
+      position: relative;
+    }
+    .section-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--gold);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 64px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(to right, var(--gold-dim), transparent);
+      opacity: 0.4;
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2px;
+    }
+    .product-card {
+      background: var(--surface);
+      padding: 48px 40px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s;
+      border: 1px solid #1a2030;
+    }
+    .product-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 2px;
+      background: var(--gold);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s ease;
+    }
+    .product-card:hover::before { transform: scaleX(1); }
+    .product-card:hover { background: #111820; border-color: #1e2d45; }
+
+    .product-num {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--gold-dim);
+      margin-bottom: 24px;
+    }
+    .product-name {
+      font-family: var(--sans);
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      letter-spacing: -0.02em;
+    }
+    .product-desc {
+      font-size: 14px;
+      line-height: 1.7;
+      color: #6a7d95;
+    }
+    .product-tag {
+      display: inline-block;
+      margin-top: 24px;
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--gold);
+      background: rgba(201,168,76,0.08);
+      padding: 4px 10px;
+      letter-spacing: 0.1em;
+    }
+
+    /* ── ABOUT ── */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+    .about-text h2 {
+      font-size: clamp(36px, 4vw, 56px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
+      margin-bottom: 32px;
+    }
+    .about-text p {
+      font-size: 16px;
+      line-height: 1.8;
+      color: #6a7d95;
+      margin-bottom: 20px;
+    }
+    .about-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+    .stat-item {
+      border-left: 2px solid var(--gold-dim);
+      padding-left: 20px;
+    }
+    .stat-num {
+      font-family: var(--mono);
+      font-size: 36px;
+      font-weight: 700;
+      color: var(--gold);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* ── CONTACT ── */
+    .contact-section {
+      padding: 100px 48px;
+      text-align: center;
+      position: relative;
+    }
+    .contact-section::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 1px;
+      height: 80px;
+      background: linear-gradient(to bottom, transparent, var(--gold-dim));
+    }
+    .contact-section h2 {
+      font-size: clamp(36px, 5vw, 72px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      margin-bottom: 24px;
+    }
+    .contact-section p {
+      font-size: 16px;
+      color: #6a7d95;
+      margin-bottom: 48px;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.7;
+    }
+    .contact-email {
+      font-family: var(--mono);
+      font-size: 18px;
+      color: var(--gold);
+      text-decoration: none;
+      border-bottom: 1px solid var(--gold-dim);
+      padding-bottom: 4px;
+      transition: all 0.2s;
+    }
+    .contact-email:hover { color: #e8c46a; border-color: #e8c46a; }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 32px 48px;
+      border-top: 1px solid #1a2030;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    footer .logo { font-size: 13px; }
+    footer p {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+    }
+
+    /* ── ANIMATIONS ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 20px 24px; }
+      nav ul { display: none; }
+      .hero { padding: 100px 24px 60px; }
+      .binary-float { display: none; }
+      .section { padding: 60px 24px; }
+      .about-grid { grid-template-columns: 1fr; gap: 48px; }
+      footer { flex-direction: column; gap: 12px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<nav>
+  <div class="logo">01d<span>_Monk</span></div>
+  <ul>
+    <li><a href="#products">Products</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<section class="hero">
+  <div class="hero-inner">
+    <div class="tag">Digital Products Studio</div>
+    <h1>
+      <span class="binary">01d</span><br>
+      Monk<span class="underscore">_</span>
+    </h1>
+    <p class="hero-desc">
+      We build digital products at the intersection of Web3 and consumer gaming. 
+      Thoughtful engineering. Disciplined execution. Zero compromise.
+    </p>
+    <div class="hero-actions">
+      <a href="#products" class="btn-primary">Our Products</a>
+      <a href="#contact" class="btn-secondary">Get in touch</a>
+    </div>
+  </div>
+  <div class="binary-float">
+    01001101<br>01101111<br>01101110<br>01101011<br>00100000<br>
+    01000010<br>01110101<br>01101001<br>01101100<br>01100100<br>
+    01110011<br>00100000<br>01010111<br>01100101<br>01100010<br>
+    00110011<br>00100000<br>01000111<br>01100001<br>01101101
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="section" id="products">
+  <div class="section-label">What we build</div>
+  <div class="products-grid">
+    <div class="product-card reveal">
+      <div class="product-num">001</div>
+      <div class="product-name">CryptoBingo</div>
+      <p class="product-desc">
+        Social 90-ball bingo with Solana USDC staking. Real-money group play 
+        for friends and family — non-custodial, gasless, and fair.
+      </p>
+      <span class="product-tag">Live — Beta</span>
+    </div>
+    <div class="product-card reveal" style="transition-delay:0.1s">
+      <div class="product-num">002</div>
+      <div class="product-name">Web3 Gaming</div>
+      <p class="product-desc">
+        Expanding the 01d_Monk portfolio into skill-based tournament games 
+        with embedded wallets and on-chain prize distribution.
+      </p>
+      <span class="product-tag">In Development</span>
+    </div>
+    <div class="product-card reveal" style="transition-delay:0.2s">
+      <div class="product-num">003</div>
+      <div class="product-name">Infrastructure</div>
+      <p class="product-desc">
+        Solana Anchor programs, Firebase Cloud Functions, and Flutter 
+        mobile SDKs powering the next generation of Web3 consumer apps.
+      </p>
+      <span class="product-tag">Open Source</span>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="section" id="about">
+  <div class="section-label">About</div>
+  <div class="about-grid">
+    <div class="about-text reveal">
+      <h2>Discipline<br>over noise.</h2>
+      <p>
+        01d_Monk is a digital products studio building at the edge of 
+        Web3 and mainstream consumer gaming. We move deliberately, 
+        ship with precision, and build for 10 million users from day one.
+      </p>
+      <p>
+        Incorporated in the United Kingdom. Engineering everywhere.
+      </p>
+    </div>
+    <div class="about-stats reveal" style="transition-delay:0.15s">
+      <div class="stat-item">
+        <div class="stat-num">Web3</div>
+        <div class="stat-label">Native Stack</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">0→1</div>
+        <div class="stat-label">Builder Mindset</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">UK</div>
+        <div class="stat-label">Registered</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">SOL</div>
+        <div class="stat-label">Blockchain</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="contact-section" id="contact">
+  <h2 class="reveal">Let's build<br>together.</h2>
+  <p class="reveal" style="transition-delay:0.1s">Partnerships, press, or product enquiries — we're easy to reach.</p>
+  <a href="mailto:hello@01dmonk.com" class="contact-email reveal" style="transition-delay:0.2s">hello@01dmonk.com</a>
+</section>
+
+<footer>
+  <div class="logo">01d<span>_Monk</span></div>
+  <p>© 2025 01d_Monk Ltd. All rights reserved.</p>
+  <p>Built in binary. Shipped with discipline.</p>
+</footer>
+
+<script>
+  // Cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+  document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+  function animCursor() {
+    cursor.style.left = mx - 4 + 'px';
+    cursor.style.top = my - 4 + 'px';
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) *.12;
+    ring.style.left = rx - 16 + 'px';
+    ring.style.top = ry - 16 + 'px';
+    requestAnimationFrame(animCursor);
+  }
+  animCursor();
+
+  // Reveal on scroll
+  const reveals = document.querySelectorAll('.reveal');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.15 });
+  reveals.forEach(r => obs.observe(r));
+
+  // Binary float random refresh
+  const binaryLines = document.querySelector('.binary-float');
+  if (binaryLines) {
+    setInterval(() => {
+      const lines = Array.from({length: 20}, () =>
+        Array.from({length: 8}, () => Math.round(Math.random())).join('')
+      );
+      binaryLines.innerHTML = lines.join('<br>');
+    }, 2000);
+  }
+</script>
+</body>
+</html>
