@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Payment Successful – CryptoBingo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      text-align: center;
+      padding: 60px 20px;
+      background: #0f0f0f;
+      color: white;
+      margin: 0;
+    }
+    h2 { font-size: 28px; margin-bottom: 12px; }
+    p { color: #aaa; font-size: 16px; }
+  </style>
+</head>
+<body>
+  <h2>Funds Added!</h2>
+  <p>Your USDC is on the way.<br>You can return to the app.</p>
+  <script>
+    // Signal the Flutter WebView to complete the funding flow
+    window.location.href = "cryptobingo://transfi-success";
+  </script>
+</body>
+</html>
